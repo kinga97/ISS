@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="hu">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ISS</title>
+    <style>
+        #issid { 
+            height: 180px; 
+            }
+    </style>
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.7.1/dist/leaflet.css"
+    integrity="sha512-xodZBNTC5n17Xt2atTPuE1HxjVMSvLVW9ocqUKLsCC5CXdbqCmblAshOMAS6/keqq/sMZMZ19scR4PsZChSR7A=="
+    crossorigin=""/>
+    <script src="https://unpkg.com/leaflet@1.7.1/dist/leaflet.js"
+    integrity="sha512-XQoYMqMTK8LvdxXYG3nZ448hOEQiglfqkJs1NOQV44cWnUrBc8PkAOcXy20w0vlaXaVUearIOBhiXZ5V3ynxwA=="
+    crossorigin=""></script>
+</head>
+<body>
+    <div>
+        <p>A hosszúsági koordináta: <span id="lat"></span><br>
+            A szélességi koordináta: <span id="lon"></span>
+        </p>
+    </div>
+
+    <div id="issid"></div>
+
+    <script>
+        const mymap = L.map('issid').setView([0, 0], 1);
+        
+        const attribution = '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors';
+        const tileURL = 'https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png';
+        const tiles = L.tileLayer(tileURL, { attribution });
+        tiles.addTo(mymap);
+
+        const ISSicon = L.icon({
+            iconUrl: 'iss200.png',
+            iconSize: [50, 32],
+            iconAnchor: [25, 16]
+        });
+
+        const marker = L.marker([0, 0], { icon: ISSicon}).addTo(mymap);
+        
+       
+
+        const api_url = 'https://api.wheretheiss.at/v1/satellites/25544';
+
+        async function getISS() {
+            const response = await fetch(api_url);
+            const data = await response.json();
+            const { latitude, longitude } = data;
+
+           // L.marker([latitude, longitude]).addTo(mymap);
+           marker.setLatLng([latitude, longitude]);
+           mymap.setView([latitude, longitude], 2);
+
+            document.getElementById('lat').innerText = latitude;
+            document.getElementById('lon').innerText = longitude;
+        }
+
+        getISS();
+
+        // setInterval(getISS, 1000);
+    </script>
+</body>
+</html>
